@@ -1,7 +1,21 @@
-# Infraestructura local: MySQL (con las 5 bases de datos) y Kafka (modo KRaft, sin Zookeeper)
-# Levantar:  docker compose up -d
-# Detener:   docker compose down        (agrega -v para borrar tambien los datos de MySQL)
 services:
+  eureka-server:
+    build: ./eureka-server
+    container_name: eureka-server
+    ports:
+      - "8761:8761"
+
+  api-gateway:
+    build: ./api-gateway
+    container_name: api-gateway
+    ports:
+      - "8080:8080"
+    depends_on:
+      - eureka-server
+    environment:
+      # Dentro de Docker, Eureka no esta en "localhost" sino en el servicio "eureka-server"
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+
   mysql:
     image: mysql:8.4
     container_name: mysql-tienda
